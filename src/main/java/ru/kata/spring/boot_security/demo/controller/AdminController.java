@@ -52,7 +52,7 @@ public class AdminController {
       return "edit";
     }
 
-    userService.updateUser(id, user);
+    userService.updateUser(user);
     return "redirect:/admin";
   }
 
