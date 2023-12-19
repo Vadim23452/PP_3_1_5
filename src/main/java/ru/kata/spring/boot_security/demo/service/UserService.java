@@ -27,7 +27,7 @@ public class UserService implements UserDetailsService {
   private UserRepository userRepository;
 
   @Autowired
-  private RoleRepository roleRepository;
+  private RoleService roleService;
 
 
   @Autowired
@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
 
   @Transactional
   public void saveUser(User user) {
-    user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
+    user.setRoles(Collections.singleton(roleService.getAllRoles().get(0)));
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     userRepository.save(user);
   }
