@@ -1,83 +1,55 @@
 package ru.kata.spring.boot_security.demo.controller;
 
-import javax.validation.Valid;
+import java.security.Principal;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-
   private final UserService userService;
-
+  private final RoleService roleService;
   @Autowired
-  public AdminController(UserService userService) {
+  public AdminController(UserService userService, RoleService roleService) {
     this.userService = userService;
+    this.roleService = roleService;
   }
 
   @GetMapping()
-  public String showUsers(Model model) {
+  public String userPage(Principal principal, Model model) {
+
+    model.addAttribute("newUser", new User());
+    Set<Role> roles = new HashSet<>(roleService.getAllRoles());
+    model.addAttribute("allRoles", roles);
+    User user = userService.findUsersByEmail(principal.getName());
+    model.addAttribute("user", user);
     model.addAttribute("users", userService.getAllUsers());
-    return "usersPage";
+    return "admin";
   }
 
-  @GetMapping("/")
-  public String showUser(@RequestParam("id") Long id, Model model) {
-    model.addAttribute("user", userService.showUserById(id));
-    return "userPage";
-  }
-
-  @GetMapping("/edit")
-  public String editUser(Model model, @RequestParam("id") Long id) {
-    model.addAttribute("user", userService.showUserById(id));
-    return "edit";
-  }
-
-  @PatchMapping()
-  public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
-      @RequestParam("id") Long id) {
-
-    if (bindingResult.hasErrors()) {
-      return "edit";
-    }
-
-    userService.updateUser(user);
+  @PostMapping()
+  public String createUser(@ModelAttribute("user") User user) {
+    userService.add(user);
     return "redirect:/admin";
   }
 
-  @DeleteMapping()
-  public String deleteUser(@RequestParam("id") Long id) {
+  @PatchMapping(value = "/test2/{id}")
+  public String updateUser(@ModelAttribute("user") User updatedUser, @PathVariable("id") Long id) {
+    userService.updateUser(updatedUser, id);
+    return "redirect:/admin";
+  }
+
+  @DeleteMapping("/{id}")
+  public String deleteUser(@PathVariable("id") Long id) {
     userService.deleteUser(id);
     return "redirect:/admin";
   }
-
-  @GetMapping("/new")
-  public String newUser(Model model) {
-    model.addAttribute("user", new User());
-    return "new";
-  }
-
-  @PostMapping
-  public String createUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
-
-    if (bindingResult.hasErrors()) {
-      return "new";
-    }
-
-    userService.saveUser(user);
-    return "redirect:/admin";
-  }
-
-
 }

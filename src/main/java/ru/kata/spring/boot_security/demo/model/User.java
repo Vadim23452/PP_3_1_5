@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.model;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,10 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -25,49 +24,27 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User implements UserDetails {
 
   @Id
-  @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotEmpty(message = "The field must not be empty")
-  @Size(min = 2, max = 15, message = "Must be from 2 to 15 character")
-  @Column(name = "name")
-  private String name;
+  private String firstName;
 
-  @NotEmpty(message = "The field must not be empty")
-  @Size(min = 2, max = 15, message = "Must be from 2 to 15 character")
-  @Column(name = "last_name")
-  private String lastName;
+  private String lastname;
 
-  @Min(value = 5, message = "Error in entering age")
-  @Column(name = "age")
-  private Integer age;
-
-  @NotEmpty(message = "The field must not be empty")
-  @Email(message = "Not Valid email")
-  @Column(name = "email")
+  private Long age;
+  @Column(name = "email", unique = true)
   private String email;
 
-  @Column(name = "address")
-  private String address;
-
-  @Column(name = "username")
-  private String username;
-
-  @Column(name = "password")
   private String password;
 
-  @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-  @JoinTable(
-      name = "users_roles",
+  @Fetch(FetchMode.JOIN)
+  @ManyToMany
+  @JoinTable(name = "users_roles",
       joinColumns = @JoinColumn(name = "user_id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id")
-  )
-  @Column(name = "role")
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles;
 
   public User() {
-
   }
 
   public Set<Role> getRoles() {
@@ -78,6 +55,14 @@ public class User implements UserDetails {
     this.roles = roles;
   }
 
+  public Long getAge() {
+    return age;
+  }
+
+  public void setAge(Long age) {
+    this.age = age;
+  }
+
   public String getEmail() {
     return email;
   }
@@ -86,12 +71,50 @@ public class User implements UserDetails {
     this.email = email;
   }
 
-  public String getUsername() {
-    return username;
+  public Long getId() {
+    return id;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public String getLastname() {
+    return lastname;
+  }
+
+  public void setLastname(String lastname) {
+    this.lastname = lastname;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public String roleToString() {
+    return roles.stream().map(Object::toString).collect(Collectors.joining(", "));
+  }
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return getRoles();
+  }
+
+  @Override
+  public String getUsername() {
+    return email;
   }
 
   @Override
@@ -112,58 +135,5 @@ public class User implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
-  }
-
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return getRoles();
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getLastName() {
-    return lastName;
-  }
-
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
-
-  public String getAddress() {
-    return address;
-  }
-
-  public void setAddress(String address) {
-    this.address = address;
-  }
-
-  public Integer getAge() {
-    return age;
-  }
-
-  public void setAge(Integer age) {
-    this.age = age;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 }
