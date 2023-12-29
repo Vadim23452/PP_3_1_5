@@ -1,12 +1,9 @@
 package ru.kata.spring.boot_security.demo.service;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.configs.PasswordEncoderConfig;
@@ -19,19 +16,18 @@ public class UserService implements UserDetailsService {
   private final UserRepository userRepository;
   private final PasswordEncoderConfig passwordEncoder;
 
-  @Autowired
   public UserService(UserRepository userRepository, PasswordEncoderConfig passwordEncoder) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
   }
   @Transactional
-  public void add(User user) {
+  public void addUser(User user) {
     user.setPassword(passwordEncoder.passwordEncoder().encode(user.getPassword()));
     userRepository.save(user);
   }
 
   @Transactional(readOnly = true)
-  public List<User> getAllUsers() {
+  public List<User> showUsers() {
     return userRepository.findAll();
   }
 
@@ -41,15 +37,7 @@ public class UserService implements UserDetailsService {
   }
 
   @Transactional
-  public void updateUser(User updatedUser) {
-
-    updatedUser.setPassword(passwordEncoder.passwordEncoder().encode(updatedUser.getPassword()));
-    userRepository.save(updatedUser);
-  }
-
-  @Transactional
   public void deleteUser(Long id) {
-
     userRepository.deleteById(id);
   }
 

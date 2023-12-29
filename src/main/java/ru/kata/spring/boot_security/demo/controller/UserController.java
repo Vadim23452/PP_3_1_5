@@ -15,15 +15,14 @@ public class UserController {
 
   private final UserService userService;
 
-  @Autowired
   public UserController(UserService userService) {
     this.userService = userService;
   }
 
   @GetMapping()
-  public String userPage(Principal principal, Model model) {
-    User user = userService.findUsersByEmail(principal.getName());
-    model.addAttribute("user", user);
+  public String showUser(Principal principal, Model model) {
+//    userService.findUsersByEmail(principal.getName());
+    model.addAttribute("user", userService.findUsersByEmail(principal.getName()));
     return "user";
   }
 }
