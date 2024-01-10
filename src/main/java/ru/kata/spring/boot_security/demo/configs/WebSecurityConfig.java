@@ -16,8 +16,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final UserService userService;
   private final PasswordEncoderConfig passwordEncoderConfig;
 
-  public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService,
-                            PasswordEncoderConfig passwordEncoderConfig) {
+  public WebSecurityConfig(SuccessUserHandler successUserHandler,
+                           UserService userService,
+                           PasswordEncoderConfig passwordEncoderConfig) {
     this.successUserHandler = successUserHandler;
     this.userService = userService;
     this.passwordEncoderConfig = passwordEncoderConfig;
@@ -26,9 +27,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http
+        .httpBasic()
+        .and()
+        .csrf()
+        .disable()
         .authorizeRequests()
-        .antMatchers("/admin/**").hasRole("ADMIN")
-        .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+        .antMatchers("/login").permitAll()
+        .antMatchers("/api/admin/**").hasRole("ADMIN")
+        .antMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
         .anyRequest().authenticated()
         .and()
         .formLogin().loginPage("/login")
@@ -38,8 +44,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .logout()
         .permitAll();
   }
-
-
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
       DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();

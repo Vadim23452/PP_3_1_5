@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.model;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,54 +9,60 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import org.springframework.security.core.GrantedAuthority;
 
+
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 public class Role implements GrantedAuthority {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Integer id;
 
-  private String name;
+  @Column(name = "type")
+  private String roleType;
 
   public Role() {
   }
 
-  public Long getId() {
-    return id;
+  public Role(String roleType) {
+    this.roleType = roleType;
   }
 
-  public void setId(Long id) {
+  public Role(Integer id) {
     this.id = id;
   }
 
-  public Role(String name) {
-    this.name = name;
+  public Role(Integer id, String roleType) {
+    this.id = id;
+    this.roleType = roleType;
   }
 
-  public String getName() {
-    return name;
+
+  public Integer getId() {
+    return id;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setId(Integer id) {
+    this.id = id;
   }
+
+  public String getRoleType() {
+    return roleType;
+  }
+
+  public void setRoleType(String roleType) {
+    this.roleType = roleType;
+  }
+
 
   @Override
   public String getAuthority() {
-    return getName();
+    return getRoleType();
   }
 
   @Override
   public String toString() {
-    String role = getName();
-    if (role.equals("ROLE_ADMIN")) {
-      return "ADMIN";
-    }
-    if (role.equals("ROLE_USER")) {
-      return "USER";
-    }
-    return role;
+    return roleType.substring(5);
   }
 
 }

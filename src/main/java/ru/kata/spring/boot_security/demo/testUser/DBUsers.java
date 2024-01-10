@@ -32,11 +32,11 @@ public class DBUsers {
         Set<Role> userRole = new HashSet<>();
         userRole.add(roleUser);
 
-        roleService.saveRole(roleAdmin);
-        roleService.saveRole(roleUser);
+        roleService.save(roleAdmin);
+        roleService.save(roleUser);
 
-        User admin = new User("Игорь", "Игорев", 20, "admin", "admin", adminRole);
-        User user = new User("Гриша", "Гришин", 21, "user", "user", userRole);
+        User admin = new User("admin","adminov",22,"admin@mail.ru","admin",adminRole);
+        User user = new User("user","userkov",20,"user@mail.ru","user",userRole);
 
         userService.addUser(admin);
         userService.addUser(user);
